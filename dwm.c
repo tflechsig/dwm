@@ -164,7 +164,6 @@ static void detachstack(Client *c);
 static Monitor *dirtomon(int dir);
 static void drawbar(Monitor *m);
 static void drawbars(void);
-static void enternotify(XEvent *e);
 static void expose(XEvent *e);
 static void focus(Client *c);
 static void focusin(XEvent *e);
@@ -183,7 +182,6 @@ static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
 static void monocle(Monitor *m);
-static void motionnotify(XEvent *e);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
 static void pop(Client *c);
@@ -251,13 +249,11 @@ static void (*handler[LASTEvent]) (XEvent *) = {
   [ConfigureRequest] = configurerequest,
   [ConfigureNotify] = configurenotify,
   [DestroyNotify] = destroynotify,
-  [EnterNotify] = enternotify,
   [Expose] = expose,
   [FocusIn] = focusin,
   [KeyPress] = keypress,
   [MappingNotify] = mappingnotify,
   [MapRequest] = maprequest,
-  [MotionNotify] = motionnotify,
   [PropertyNotify] = propertynotify,
   [UnmapNotify] = unmapnotify
 };
@@ -428,7 +424,8 @@ buttonpress(XEvent *e)
 
   click = ClkRootWin;
   /* focus monitor if necessary */
-  if ((m = wintomon(ev->window)) && m != selmon) {
+  if ((m = wintomon(ev->window)) && m != selmon
+      && (focusonwheel || (ev->button != Button4 && ev->button != Button5))) {
     unfocus(selmon->sel, 1);
     selmon = m;
     focus(NULL);
@@ -448,8 +445,8 @@ buttonpress(XEvent *e)
     else
       click = ClkWinTitle;
   } else if ((c = wintoclient(ev->window))) {
-    focus(c);
-    restack(selmon);
+    if (focusonwheel || (ev->button != Button4 && ev->button != Button5))
+      focus(c);
     XAllowEvents(dpy, ReplayPointer, CurrentTime);
     click = ClkClientWin;
   }
@@ -672,10 +669,11 @@ deck(Monitor *m) {
     mw = m->nmaster ? m->ww * m->mfact : 0;
     ns = m->nmaster > 0 ? 2 : 1;
     snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n - m->nmaster);
-  } else {
-    mw = m->ww;
+  } else{
+    mw = m -> ww;
     ns = 1;
   }
+
   for(i = 0, my = gappx, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
     if(i < m->nmaster) {
       h = (m->wh - my) / (MIN(n, m->nmaster) - i) - gappx;
@@ -784,25 +782,6 @@ drawbars(void)
 
   for (m = mons; m; m = m->next)
     drawbar(m);
-}
-
-void
-enternotify(XEvent *e)
-{
-  Client *c;
-  Monitor *m;
-  XCrossingEvent *ev = &e->xcrossing;
-
-  if ((ev->mode != NotifyNormal || ev->detail == NotifyInferior) && ev->window != root)
-    return;
-  c = wintoclient(ev->window);
-  m = c ? c->mon : wintomon(ev->window);
-  if (m != selmon) {
-    unfocus(selmon->sel, 1);
-    selmon = m;
-  } else if (!c || c == selmon->sel)
-    return;
-  focus(c);
 }
 
 void
@@ -1141,24 +1120,7 @@ monocle(Monitor *m)
   if (n > 0) /* override layout symbol */
     snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n);
   for (c = nexttiled(m->clients); c; c = nexttiled(c->next))
-    resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, 0);
-}
-
-void
-motionnotify(XEvent *e)
-{
-  static Monitor *mon = NULL;
-  Monitor *m;
-  XMotionEvent *ev = &e->xmotion;
-
-  if (ev->window != root)
-    return;
-  if ((m = recttomon(ev->x_root, ev->y_root, 1, 1)) != mon && mon) {
-    unfocus(selmon->sel, 1);
-    selmon = m;
-    focus(NULL);
-  }
-  mon = m;
+    resize(c, m->wx + gappx, m->wy + gappx, m->ww - 2 * c->bw - 2 * gappx, m->wh - 2 * c->bw - 2 * gappx, 0);
 }
 
 void
