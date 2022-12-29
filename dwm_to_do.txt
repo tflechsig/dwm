@@ -1,7 +1,7 @@
 DWM To Do List
 x - Focus window on mouse click, not on mouse hover
 x - Add alt-tab and alt-shift-tab as a method for switching windows
-- Add window count along with the window number to both the deck and monocle
-  layouts
+x - Add window count along with the window number to both the deck and monocle
+    layouts
 - Modify the current tag indicator (is there a patch for this?)
 - Add  clickable icon to the left side of the status bar to launch rofi
