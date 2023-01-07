@@ -764,10 +764,12 @@ drawbar(Monitor *m)
     w = TEXTW(tags[i]);
     drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
     drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+    // if there are conflicts, just move these lines directly underneath
+    // both 'drw_setscheme' and 'drw_text' :)
+		if (ulineall || m->tagset[m->seltags] & 1 << i)
+			drw_rect(drw, x + ulinepad, bh - ulinestroke - ulinevoffset, w - (ulinepad * 2), ulinestroke, 1, 0);
     if (occ & 1 << i)
-      drw_rect(drw, x + boxs, boxs, boxw, boxw,
-        m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
-        urg & 1 << i);
+      drw_rect(drw, x + boxs, boxs, boxw, boxw, 1, urg & 1 << i);
     x += w;
   }
   w = TEXTW(m->ltsymbol);
@@ -779,7 +781,7 @@ drawbar(Monitor *m)
       drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
 			drw_text(drw, x, 0, w - 2 * sp, bh, lrpad / 2, m->sel->name, 0);
       if (m->sel->isfloating)
-        drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
+        drw_rect(drw, x + boxs, boxs, boxw, boxw, 1, 0);
     } else {
       drw_setscheme(drw, scheme[SchemeNorm]);
 			drw_rect(drw, x, 0, w - 2 * sp, bh, 1, 1);
@@ -1550,7 +1552,7 @@ setup(void)
   if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
     die("no fonts could be loaded.");
   lrpad = drw->fonts->h;
-  bh = drw->fonts->h + 2;
+  bh = drw->fonts->h + 10;
 	sp = sidepad;
 	vp = (topbar == 1) ? vertpad : - vertpad;
   updategeom();

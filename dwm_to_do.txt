@@ -4,4 +4,5 @@ x - Add alt-tab and alt-shift-tab as a method for switching windows
 x - Add window count along with the window number to both the deck and monocle
     layouts
 x - Add  clickable icon to the left side of the status bar to launch rofi
-- Modify the current tag indicator (is there a patch for this?)
+x - Modify the current tag indicator
+- Add status to the right side of the bar
