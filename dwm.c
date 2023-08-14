@@ -457,18 +457,6 @@ buttonpress(XEvent *e)
         click = ClkStatusText;
   			statussig = 0;
         for (text = s = stext; *s && x <= ev->x; s++) {
-
-          //-DEBUG------------------------------------------------------------
-          FILE *tef_fp;
-          tef_fp=fopen("/home/tef/status_text.txt","a");
-          if(tef_fp == NULL) {
-            exit(-1);
-          } else {
-            fprintf(tef_fp, "ev -> x, x, stat char: %d, %d, %d, %c\n", ev->x, x, *s, *s);
-            fclose(tef_fp);
-          }
-          //-DEBUG------------------------------------------------------------
-
           if ((unsigned char)(*s) < ' ') {
   					ch = *s;
   					*s = '\0';
