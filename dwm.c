@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details.
+/* see license file for copyright and license details.
  *
  * dynamic window manager is designed like any other X client as well. It is
  * driven through handling X events. In contrast to other X clients, a window
@@ -429,8 +429,8 @@ buttonpress(XEvent *e)
   Monitor *m;
   XButtonPressedEvent *ev = &e->xbutton;
 	char *text, *s, ch;
-
   click = ClkRootWin;
+
   /* focus monitor if necessary */
   if ((m = wintomon(ev->window)) && m != selmon
       && (focusonwheel || (ev->button != Button4 && ev->button != Button5))) {
@@ -452,23 +452,37 @@ buttonpress(XEvent *e)
 				arg.ui = 1 << i;
 			} else if (ev->x < x + TEXTW(selmon->ltsymbol))
 				click = ClkLtSymbol;
-      else if (ev->x > selmon->ww - statusw) {
-        x = selmon->ww - statusw;
+      else if (ev->x > selmon->ww - statusw -  2 * sp) {
+        x = selmon->ww - statusw -  2 * sp;
         click = ClkStatusText;
   			statussig = 0;
-  			for (text = s = stext; *s && x <= ev->x; s++) {
-  				if ((unsigned char)(*s) < ' ') {
+        for (text = s = stext; *s && x <= ev->x; s++) {
+
+          //-DEBUG------------------------------------------------------------
+          FILE *tef_fp;
+          tef_fp=fopen("/home/tef/status_text.txt","a");
+          if(tef_fp == NULL) {
+            exit(-1);
+          } else {
+            fprintf(tef_fp, "ev -> x, x, stat char: %d, %d, %d, %c\n", ev->x, x, *s, *s);
+            fclose(tef_fp);
+          }
+          //-DEBUG------------------------------------------------------------
+
+          if ((unsigned char)(*s) < ' ') {
   					ch = *s;
   					*s = '\0';
   					x += TEXTW(text) - lrpad;
   					*s = ch;
   					text = s + 1;
-  					if (x >= ev->x)
+  					if (x >= ev->x) {
   						break;
+            }
   					statussig = ch;
   				}
   			}
-  		} else
+  		}
+      else
 				click = ClkWinTitle;
 		}
   } else if ((c = wintoclient(ev->window))) {
@@ -481,6 +495,7 @@ buttonpress(XEvent *e)
     if (click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
     && CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
       buttons[i].func(click == ClkTagBar && buttons[i].arg.i == 0 ? &arg : &buttons[i].arg);
+
 }
 
 void
