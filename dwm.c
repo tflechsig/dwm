@@ -54,18 +54,19 @@
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
-#define TAGMASK                 ((1 << LENGTH(tags)) - 1)
+#define TAGMASK                 ((1 << num_tags) - 1)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel }; /* color schemes */
+enum { SchemeNorm, SchemeSel, SchemeTagUnocc }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
        NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkButton, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
+enum { tagActive, tagInactive };
 
 typedef union {
   int i;
@@ -276,9 +277,6 @@ static Window root, wmcheckwin;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
-/* compile-time check if all tags fit into an unsigned int bit array. */
-struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
-
 /* function implementations */
 void
 applyrules(Client *c)
@@ -445,9 +443,9 @@ buttonpress(XEvent *e)
 			click = ClkButton;
 		} else {
 			do
-				x += TEXTW(tags[i]);
-			while (ev->x >= x && ++i < LENGTH(tags));
-			if (i < LENGTH(tags)) {
+				x += TEXTW(tag_symbols[tagInactive]);
+			while (ev->x >= x && ++i < num_tags);
+			if (i < num_tags) {
 				click = ClkTagBar;
 				arg.ui = 1 << i;
 			} else if (ev->x < x + TEXTW(selmon->ltsymbol))
@@ -798,16 +796,15 @@ drawbar(Monitor *m)
 	w = TEXTW(buttonbar);
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, buttonbar, 0);
-  for (i = 0; i < LENGTH(tags); i++) {
-    w = TEXTW(tags[i]);
-    drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
-    drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
-    // if there are conflicts, just move these lines directly underneath
-    // both 'drw_setscheme' and 'drw_text' :)
-		if (ulineall || m->tagset[m->seltags] & 1 << i)
-			drw_rect(drw, x + ulinepad, bh - ulinestroke - ulinevoffset, w - (ulinepad * 2), ulinestroke, 1, 0);
+  for (i = 0; i < num_tags; i++) {
+    w = TEXTW(tag_symbols[tagInactive]);
     if (occ & 1 << i)
-      drw_rect(drw, x + boxs, boxs, boxw, boxw, 1, urg & 1 << i);
+      drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
+    else
+      drw_setscheme(drw, scheme[SchemeTagUnocc]);
+    drw_text(drw, x, 0, w, bh, lrpad / 2, tag_symbols[tagInactive], urg & 1 << i);
+		if (ulineall || m->tagset[m->seltags] & 1 << i)
+      drw_text(drw, x, 0, w, bh, lrpad / 2, tag_symbols[tagActive], urg & 1 << i);
     x += w;
   }
   w = TEXTW(m->ltsymbol);

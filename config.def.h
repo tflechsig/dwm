@@ -1,29 +1,32 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 4;        /* border pixel of windows */
-static const unsigned int gappx     = 10;       /* gap pixel between windows */
-static const unsigned int snap      = 32;       /* snap pixel */
-static const int showbar            = 1;        /* 0 means no bar */
-static const int topbar             = 1;        /* 0 means bottom bar */
-static const int vertpad            = 10;       /* vertical padding of bar */
-static const int sidepad            = 10;       /* horizontal padding of bar */
-static const char buttonbar[]       = "";
-static const int focusonwheel       = 0;
-static const char *fonts[]          = { "JetBrains Mono Nerd Font:size=12" };
-static const char col_gray1[]       = "#2E3440";
-static const char col_gray2[]       = "#434C5E";
-static const char col_gray3[]       = "#D8DEE9";
-static const char col_gray4[]       = "#ECEFF4";
-static const char col_frost[]       = "#88C0D0";
-static const char *colors[][3]      = {
-  /*               fg         bg         border   */
-  [SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-  [SchemeSel]  = { col_gray4, col_gray1, col_frost },
+static const unsigned int borderpx    = 4;  /* border pixel of windows */
+static const unsigned int gappx       = 10; /* gap pixel between windows */
+static const unsigned int snap        = 32; /* snap pixel */
+static const int showbar              = 1;  /* 0 means no bar */
+static const int topbar               = 1;  /* 0 means bottom bar */
+static const int vertpad              = 10; /* vertical padding of bar */
+static const int sidepad              = 10; /* horizontal padding of bar */
+static const char buttonbar[]         = "";
+static const int focusonwheel         = 0;
+static const char *fonts[]            = { "JetBrains Mono Nerd Font:size=12" };
+static const char col_polar_night1[]  = "#2E3440";
+static const char col_polar_night2[]  = "#434C5E";
+static const char col_snow1[]         = "#D8DEE9";
+static const char col_snow2[]         = "#ECEFF4";
+static const char col_frost[]         = "#88C0D0";
+static const char *colors[][3]        = {
+  /*                    fg                bg                border          */
+  [SchemeNorm]      = { col_snow1       , col_polar_night1, col_polar_night2},
+  [SchemeSel]       = { col_snow1       , col_polar_night1, col_frost       },
+  [SchemeTagUnocc]  = { col_polar_night2, col_polar_night1, col_frost       },
 };
 
 /* tagging */
-static const char *tags[] = { "1", "2", "3", "4" };
+static const int num_tags = 4;
+/*                                  Active   Inactive */
+static const char *tag_symbols[] = {""    , ""    };
 
 static const unsigned int ulinepad	= 5;	/* horizontal padding between the underline and tag */
 static const unsigned int ulinestroke	= 2;	/* thickness / height of the underline */
