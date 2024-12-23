@@ -5,12 +5,17 @@ x - Add window count along with the window number to both the deck and monocle
     layouts
 x - Add  clickable icon to the left side of the status bar to launch rofi
 x - Modify the current tag indicator
+x - Change square that indicates a window is open in the workspace to a different
+    color or workspace text
+x - Use color in status barsquare that indicates a window is open in the workspace
+    to a different color or workspace text
+x - Remove window title in the center of the status bar
 - Add status to the right side of the bar
   x - Fix status button clickable width
+  x - Add clock icon
+  x - Add calendar icon
+  - Add current volume percentage next to volume icon
   - Time status won't update properly if another status button is clicked
     simultaneously
 - Cycle through all layouts when clicking the layout button
-- Change square that indicates a window is open in the workspace to a different
-  color or workspace text
-- Use color in status barsquare that indicates a window is open in the workspace
-  to a different color or workspace text
+- Add an Elkowar volume widget
